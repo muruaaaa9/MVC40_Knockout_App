@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
@@ -40,72 +43,66 @@ namespace MVC40.Knockout_App.Controllers
        
         //
         // POST: /EmployeeInfoAPI/Create
+        public HttpResponseMessage PostEmployeeInfo(EmployeeInfo employeeInfo)
+        {
+            if(ModelState.IsValid)
+            {
+                db.EmployeeInfoes.Add(employeeInfo);
+                db.SaveChanges();
 
-        //[System.Web.Mvc.HttpPost]
-        //public ActionResult Create(EmployeeInfo employeeinfo)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        db.EmployeeInfoes.Add(employeeinfo);
-        //        db.SaveChanges();
-        //        return RedirectToAction("Index");
-        //    }
+                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.Created, employeeInfo);
+                response.Headers.Location = new Uri(Url.Link("DefaultApi",new{employeeInfo.EmpNo}));
+                return response;
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest);
+            }
+        }
+       
+        //PUT
+        public HttpResponseMessage PutEmployeeInfo(int id, EmployeeInfo employeeInfo)
+        {
+            if(ModelState.IsValid && id == employeeInfo.EmpNo)
+            {
+                db.Entry(employeeInfo).State = EntityState.Modified;
 
-        //    return View(employeeinfo);
-        //}
-
-        //
-        // GET: /EmployeeInfoAPI/Edit/5
-
-        //public ActionResult Edit(int id = 0)
-        //{
-        //    EmployeeInfo employeeinfo = db.EmployeeInfoes.Find(id);
-        //    if (employeeinfo == null)
-        //    {
-        //        return HttpNotFound();
-        //    }
-        //    return View(employeeinfo);
-        //}
-
-        ////
-        //// POST: /EmployeeInfoAPI/Edit/5
-
-        //[System.Web.Mvc.HttpPost]
-        //public ActionResult Edit(EmployeeInfo employeeinfo)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        db.Entry(employeeinfo).State = EntityState.Modified;
-        //        db.SaveChanges();
-        //        return RedirectToAction("Index");
-        //    }
-        //    return View(employeeinfo);
-        //}
-
-        ////
-        //// GET: /EmployeeInfoAPI/Delete/5
-
-        //public ActionResult Delete(int id = 0)
-        //{
-        //    EmployeeInfo employeeinfo = db.EmployeeInfoes.Find(id);
-        //    if (employeeinfo == null)
-        //    {
-        //        return HttpNotFound();
-        //    }
-        //    return View(employeeinfo);
-        //}
-
-        ////
-        //// POST: /EmployeeInfoAPI/Delete/5
-
-        //[System.Web.Mvc.HttpPost, System.Web.Mvc.ActionName("Delete")]
-        //public ActionResult DeleteConfirmed(int id)
-        //{
-        //    EmployeeInfo employeeinfo = db.EmployeeInfoes.Find(id);
-        //    db.EmployeeInfoes.Remove(employeeinfo);
-        //    db.SaveChanges();
-        //    return RedirectToAction("Index");
-        //}
+                try
+                {
+                    db.SaveChanges();
+                }
+                catch(DbUpdateConcurrencyException)
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound);
+                }
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest);
+            }
+        }
+        
+        //DELETE
+        public HttpResponseMessage DeleteEmployeeInfo(int id)
+        {
+            EmployeeInfo employeeInfo = db.EmployeeInfoes.Find(id);
+            if(employeeInfo == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+            db.EmployeeInfoes.Remove(employeeInfo);
+            try
+            {
+                db.SaveChanges();
+            }
+            catch(DbUpdateConcurrencyException)
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+            return Request.CreateResponse(HttpStatusCode.OK, employeeInfo);
+        }
+        
 
         protected override void Dispose(bool disposing)
         {

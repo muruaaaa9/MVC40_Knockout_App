@@ -17,13 +17,14 @@
             <tr>
                 <td>
                     <table id="tbldml">
+                        <tr><td>EmpNo</td><td><input type="text" id="txteno" data-bind="value: $root.EmpNo" disabled="disabled" /></td></tr>
+                        <tr><td>EmpName</td><td><input type="text" id="txtename" data-bind="value: $root.EmpName" /></td></tr>
+                        <tr><td>Salary</td><td><input type="text" id="txtsal" data-bind="value: $root.Salary" /></td></tr>
+                        <tr><td>DeptName</td><td><input type="text" id="txtdname" data-bind="value: $root.DeptName" /></td></tr>
+                        <tr><td>Designation</td><td><input type="text" id="txtdesig" data-bind="value: $root.Designation" /></td></tr>
                         <tr>
-                            <td>
-                                EmpNo
-                            </td>
-                            <td>
-                                <input type="text" id="txteno" data-bind="value: $root.Empno" disabled="disabled" />
-                            </td>
+                            <td><button data-bind="click:$root.save">Save</button></td>
+                            <td><button data-bind="click:$root.update">Update</button></td>
                         </tr>
                     </table>
                 </td>
@@ -32,9 +33,7 @@
                         <table data-bind="visible: Employees().length > 0" style="border: double">
                             <thead>
                                 <tr>
-                                    <td>
-                                        EmpNo
-                                    </td>
+                                    <td>EmpNo</td>
                                     <td>EmpName</td>
                                     <td>Salary</td>
                                     <td>DeptName</td>
@@ -43,16 +42,14 @@
                                 </tr>
                             </thead>
                             <tbody data-bind="foreach:  Employees">
-                                <tr style="border: solid"  id="updtr">
-                                    <td>
-                                        <span data-bind="text:  EmpNo"></span>
-                                    </td>
-                                     <td><span data-bind="text:  EmpName"></span></td>
+                                <tr style="border: solid" data-bind="click: $root.getselectedemployee"  id="updtr">
+                                    <td><span data-bind="text:  EmpNo"></span></td>
+                                    <td><span data-bind="text:  EmpName"></span></td>
                                     <td><span data-bind="text: Salary"></span></td>
                                     <td><span data-bind="text: DeptName"></span></td>
                                     <td><span data-bind="text: Designation"></span></td>
                                     <td>
-                                        <button>Delete</button>
+                                        <button data-bind="click:$root.deleterec">Delete</button>
                                     </td>
                                 </tr>
                             </tbody>
@@ -66,15 +63,24 @@
     <script type="text/javascript">
         var EmpViewModel = function () {
             var self = this;
-            //            self.EmpNo = ko.observable("0");
+            self.EmpNo = ko.observable("0");
+            self.EmpName = ko.observable("");
+            self.Salary = ko.observable("");
+            self.DeptName = ko.observable("");
+            self.Designation = ko.observable("");
 
-            //            var EmpData = {
-            //                EmpNo: self.EmpNo
-            //            };
+            var EmpData = {
+                EmpNo: self.EmpNo,
+                EmpName: self.EmpName,
+                Salary: self.Salary,
+                DeptName: self.DeptName,
+                Designation: self.Designation
+            };
 
             self.Employees = ko.observableArray([]);
 
             GetEmployees();
+
             function GetEmployees() {
                 $.ajax({
                     type: "GET",
@@ -91,7 +97,60 @@
             }
 
             self.save = function () {
-                
+                $.ajax({
+                    type: "POST",
+                    url: "/api/EmployeeInfoAPI",
+                    data: ko.toJSON(EmpData),
+                    contentType: "application/json",
+                    success: function (data) {
+                        alert('Record added successfully');
+                        self.EmpNo(data.EmpNo);
+                        alert('The New Employee Id :' + self.EmpNo());
+                        GetEmployees();
+                    },
+                    error: function () {
+                        alert('failed');
+                    }
+                });
+            };
+
+            self.update = function () {
+                var url = "api/EmployeeInfoAPI/" + self.EmpNo();
+                $.ajax({
+                    type: "PUT",
+                    url: url,
+                    data: ko.toJSON(EmpData),
+                    contentType: "application/json",
+                    success: function (data) {
+                        alert('Record updated successfully');
+                        GetEmployees();
+                    },
+                    error: function (error) {
+                        alert(error.status + "<!----!>" + error.statusText);
+                    }
+                });
+            };
+
+            self.deleterec = function (employee) {
+                $.ajax({
+                    type: "DELETE",
+                    url: "api/EmployeeInfoAPI/" + employee.EmpNo,
+                    success:function (data) {
+                        alert('Record Deleted Successfully');
+                        GetEmployees();
+                    },
+                    error:function (error) {
+                        alert(error.status + "<!----!>" + error.statusText);
+                    }
+                });
+            };
+
+            self.getselectedemployee = function (employee) {
+                self.EmpNo(employee.EmpNo),
+                self.EmpName(employee.EmpName),
+                self.Salary(employee.Salary),
+                self.DeptName(employee.DeptName),
+                self.Designation(employee.Designation)
             };
         };
         ko.applyBindings(new EmpViewModel());
