@@ -1,0 +1,87 @@
+﻿@model MVC40.Knockout_App.Models.EmployeeInfo
+@{
+    ViewBag.Title = "Create";
+}
+<html>
+<h2>
+    Create</h2>
+<head>
+    <script src="~/Scripts/jquery-1.7.1.js"></script>
+    <script src="~/Scripts/knockout-2.2.1.js"></script>
+    <script src="~/Scripts/knockout.mapping-latest.js"></script>
+    <link href="~/Content/Site.css" rel="stylesheet" />
+</head>
+<body>
+    <form>
+        <table>
+            <tr>
+                <td>
+                    <table id="tbldml">
+                        <tr>
+                            <td>
+                                EmpNo
+                            </td>
+                            <td>
+                                <input type="text" id="txteno" data-bind="value: $root.Empno" disabled="disabled" />
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    <div class="FixedContainer">
+                        <table data-bind="visible: Employees().length > 0" style="border: double">
+                            <thead>
+                                <tr>
+                                    <td>
+                                        EmpNo
+                                    </td>
+                                </tr>
+                            </thead>
+                            <tbody data-bind="foreach:  Employees">
+                                <tr style="border: solid"  id="updtr">
+                                    <td>
+                                        <span data-bind="text:  EmpNo"></span>
+                                    </td>
+                                    <td>
+                                        <button>Delete</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </form>
+    
+    <script type="text/javascript">
+        var EmpViewModel = function () {
+            var self = this;
+            self.EmpNo = ko.observable("0");
+
+            var EmpData = {
+                EmpNo: self.EmpNo
+            };
+
+            self.Employees = ko.observableArray([]);
+
+            GetEmployees();
+
+            function GetEmployees() {
+                $.ajax({
+                    type: "GET",
+                    url: "api/EmployeeInfoAPI/",
+                    contentType: "application/json; charset=utf-8",
+                    datatype:"json",
+                    success: function (data) {
+                        self.Employees(data);
+                    },
+                    error: function (error) {
+                        alert(error.status + "<--and--> " + error.statusText);
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

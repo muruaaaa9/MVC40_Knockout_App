@@ -1,0 +1,50 @@
+﻿@model MVC40.Knockout_App.Models.EmployeeInfo
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<fieldset>
+    <legend>EmployeeInfo</legend>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.EmpNo)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.EmpNo)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.EmpName)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.EmpName)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Salary)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Salary)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.DeptName)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.DeptName)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Designation)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Designation)
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { /* id=Model.PrimaryKey */ }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>
